@@ -24,6 +24,7 @@ let dealerHand = [] // dealer hand
 let playerSum = 0; // player sum of cards
 let dealerSum = 0; // dealer sum of cards
 let outcome = document.querySelector("#game-outcome"); // game outcome 
+let aceValues = 0;  // ace(s) values
 
 // deals random card & checks for duplicates
 function dealCard(){
@@ -45,10 +46,10 @@ function dealCard(){
             displayCards.innerHTML += `
             <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
                 <div class="Deltcards" style="position: absolute">
-                    <h1><img src="${nextCard}" height="225" width="200"></h1>
+                    <img src="${nextCard}" height="225" width="200">
                         <div class='aceCard'>
                             <span>What ace value?</span>
-                            <input id="ace-value" placeholder="1 or 11">
+                            <input class="form-control" id="ace-value" placeholder="1 or 11">
                             <button class="btn btn-sm btn-success aceCardSubmit" onclick="getAceValue()">Submit</button>
                         </div>
                 </div>
@@ -61,8 +62,8 @@ function dealCard(){
         //  templete for card
     displayCards.innerHTML += `
     <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
-        <div class="Deltcards">
-            <h1><img src="${nextCard}" height="225" width="200"></h1>
+        <div class="Deltcards DeltcardsAn">
+            <img src="${nextCard}" height="225" width="200">
         </div>
     </div>`;
      }
@@ -104,15 +105,16 @@ function dealDealercards(){
     dealerHand.push(nextCard)
 }
     dealerCardSum();
+
     dealerDisplayCards.innerHTML =`
         <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
         <div class="Deltcards">
-            <h1><img src="playingCards/cardBack.png" height="225" width="200"></h1>
+            <img src="playingCards/cardBack.png" height="228" width="200">
         </div>
     </div>
     <div class="col-sm-2 col-md-2 col-lg-2 col-xl-2">
         <div class="Deltcards">
-            <h1><img src=${dealerHand[1]} height="225" width="200"></h1>
+            <img src=${dealerHand[1]} height="225" width="200">
         </div>
     </div>`;
 }
@@ -125,6 +127,9 @@ function playerCardSum(){
     playerSum = 0;
     for (const card in playerHand) {
         playerSum += deck[playerHand[card]]   
+    }
+    if (aceValues > 0) {
+        playerSum += aceValues
     }
     console.log("Player cards Sum: " + playerSum);
 }
@@ -205,13 +210,23 @@ function setDealAceValue(){
 function getAceValue() {
     let aceValue = document.querySelector("#ace-value").value;
     if (aceValue == 1 || aceValue == 11) {
-        playerSum += Number(aceValue);
+        // playerSum += Number(aceValue);
+        aceValues += Number(aceValue)
+        playerCardSum(); // set player sum when ace card is drawn 
         console.log("Player sum with entered Ace value:" + playerSum);
         document.querySelector(".aceCard").remove();
         document.querySelector("#deal-card-btn").disabled = false;
         document.querySelector("#stand-btn").disabled = false;
     }
     else{
-    alert("Please enter 1 or 11")
+        let banner = document.createElement("div");
+        banner.className = "warningBanner"
+        banner.innerHTML = 'Please enter 1 or 11!';
+        document.querySelector(".aceCard").appendChild(banner);
+
+    // remove banner after 3s
+    setTimeout(() => {
+        document.querySelector('.warningBanner').remove();
+        }, 3000);
     }
 }
